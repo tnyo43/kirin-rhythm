@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Game exposing (Data, initData, clock)
 import Lane exposing (Combo(..), Lane, addCombo, addNote, initLanes, lanes, press, resetComboIfCut, step)
 import Playground exposing (..)
 import ScorePanel exposing (scorePanel)
@@ -18,7 +19,7 @@ main =
             0
             (Continue 0)
             initLanes
-            0
+            initData
         )
 
 
@@ -30,7 +31,7 @@ type alias Memory =
     { score : Int
     , combo : Combo
     , lanes : List Lane
-    , clock : Number
+    , data : Data
     }
 
 
@@ -38,30 +39,31 @@ update : Computer -> Memory -> Memory
 update computer memory =
     let
         ( ls, newScore, newCombo ) =
-            List.map
-                (\lane ->
-                    (if currentClock < memory.clock then
-                        addNote lane
+            List.map2 Tuple.pair addNow memory.lanes
+            |>
+                List.map
+                    (\( addnow, lane ) ->
+                        (if addnow then
+                            addNote lane
 
-                     else
-                        lane
+                        else
+                            lane
+                        )
+                            |> press (Set.member lane.key computer.keyboard.keys)
                     )
-                        |> press (Set.member lane.key computer.keyboard.keys)
+            |> step
+            |> (\( lane_, score, combo ) ->
+                    ( lane_, score + memory.score, addCombo combo memory.combo )
                 )
-                memory.lanes
-                |> step
-                |> (\( lane_, score, combo ) ->
-                        ( lane_, score + memory.score, addCombo combo memory.combo )
-                   )
 
-        currentClock =
-            spin 3 computer.time
+        ( updatedData, addNow ) =
+            clock computer.time memory.data
     in
     { memory
         | score = newScore
         , combo = resetComboIfCut newCombo
         , lanes = ls
-        , clock = currentClock
+        , data = updatedData
     }
 
 
