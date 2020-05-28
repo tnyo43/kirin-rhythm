@@ -1,4 +1,4 @@
-module Lane exposing (Combo(..), Lane, addCombo, addNote, comboToInt, initLanes, lanes, press, resetComboIfCut, step, mentionedKeysLen)
+module Lane exposing (Combo(..), Lane, addCombo, addNote, comboToInt, initLanes, lanes, press, resetComboIfCut, step)
 
 import Array exposing (Array)
 import Playground exposing (..)
