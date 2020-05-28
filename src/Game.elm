@@ -1,4 +1,4 @@
-module Game exposing (..)
+module Game exposing (Data, initData, clock)
 
 import Array exposing (Array)
 import Binary exposing (fromHex, toBooleans)
@@ -53,11 +53,26 @@ isNoteAdd melody elapsed =
         melody
 
 
+spinRate : Data -> Float
+spinRate data =
+    (case data.unit of
+        N4 ->
+            1
+
+        N8 ->
+            0.5
+
+        N16 ->
+            0.25
+    )
+        |> (*) (toFloat 60 / toFloat data.bpm)
+
+
 clock : Time -> Data -> ( Data, List Bool )
 clock time data =
     let
         currentClock =
-            spin 1 time
+            spin (spinRate data) time
 
         tik =
             data.clock > currentClock
