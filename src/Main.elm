@@ -1,8 +1,8 @@
 module Main exposing (main)
 
-import Animation exposing (..)
 import Game exposing (Data, clock, initData)
 import Lane exposing (Combo(..), Lane, addCombo, addNote, initLanes, lanes, press, resetComboIfCut, step)
+import LeafAnimation exposing (..)
 import Playground exposing (..)
 import ScorePanel exposing (scorePanel)
 import Set exposing (member)
@@ -53,13 +53,13 @@ update computer memory =
                         )
                             |> press (Set.member lane.key computer.keyboard.keys)
                     )
-                |> Lane.step
+                |> step
                 |> (\( lane_, ( score, combo ), leaves_ ) ->
                         ( lane_, ( score + memory.score, addCombo combo memory.combo ), initLeaves computer.time leaves_ )
                    )
 
         updatedLeaves =
-            Animation.filterLeaves
+            filterLeaves
                 computer.time
                 memory.leaves
                 |> (++) leaves
@@ -82,7 +82,9 @@ update computer memory =
 
 view : Computer -> Memory -> List Shape
 view computer memory =
-    ([])
+    [ image 1000 1000 "/assets/kirin.png"
+        |> move -800 -300
+    ]
         |> movingLeaves computer.time memory.leaves
         |> scorePanel { score = memory.score, combo = memory.combo }
         |> lanes memory.lanes

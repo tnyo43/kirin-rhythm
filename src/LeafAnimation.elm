@@ -1,5 +1,6 @@
-module Animation exposing (..)
+module LeafAnimation exposing (Leaf, filterLeaves, initLeaves, movingLeaves)
 
+import Lane exposing (panelSize, panelScale)
 import Playground exposing (..)
 
 
@@ -57,36 +58,6 @@ filterLeaves time leaves =
         )
         leaves
 
-step : Time -> List Leaf -> List Leaf
-step time leaves =
-    List.map
-        (\leaf ->
-            let
-                past =
-                    spin moveTime time
-                        - leaf.startAt
-                        |> floor
-                        |> modBy 360
-                        |> (+) 1
-                        |> toFloat
-
-                ratio =
-                    past / 360
-            in
-            { leaf | x = (Tuple.first destination - leaf.x) * ratio + leaf.x, y = (Tuple.second destination - leaf.y) * ratio + leaf.y, scale = leaf.scale * (1 - ratio) }
-                |> Just
-        )
-        leaves
-        |> List.foldl
-            (\l lst ->
-                case l of
-                    Just le ->
-                        le :: lst
-
-                    _ ->
-                        lst
-            )
-            []
 
 movingLeaves : Time -> List Leaf -> List Shape -> List Shape
 movingLeaves time leaves lst =
@@ -109,10 +80,13 @@ movingLeaves time leaves lst =
                 y =
                     Tuple.second destination * ratio + leaf.y * (1 - ratio)
 
+                size =
+                    panelSize * panelScale
+
             in
             image
-                100
-                100
+                size
+                size
                 "/assets/leaf_lightgreen.png"
                 |> move x y
         )
