@@ -1,6 +1,7 @@
 module Main exposing (main)
 
-import Game exposing (Data, initData, clock)
+import Animation exposing (..)
+import Game exposing (Data, clock, initData)
 import Lane exposing (Combo(..), Lane, addCombo, addNote, initLanes, lanes, press, resetComboIfCut, step)
 import Playground exposing (..)
 import ScorePanel exposing (scorePanel)
@@ -20,6 +21,7 @@ main =
             (Continue 0)
             initLanes
             initData
+            []
         )
 
 
@@ -32,29 +34,35 @@ type alias Memory =
     , combo : Combo
     , lanes : List Lane
     , data : Data
+    , leaves : List Leaf
     }
 
 
 update : Computer -> Memory -> Memory
 update computer memory =
     let
-        ( ls, newScore, newCombo ) =
+        ( ls, ( newScore, newCombo ), leaves ) =
             List.map2 Tuple.pair addNow memory.lanes
-            |>
-                List.map
+                |> List.map
                     (\( addnow, lane ) ->
                         (if addnow then
                             addNote lane
 
-                        else
+                         else
                             lane
                         )
                             |> press (Set.member lane.key computer.keyboard.keys)
                     )
-            |> step
-            |> (\( lane_, score, combo ) ->
-                    ( lane_, score + memory.score, addCombo combo memory.combo )
-                )
+                |> Lane.step
+                |> (\( lane_, ( score, combo ), leaves_ ) ->
+                        ( lane_, ( score + memory.score, addCombo combo memory.combo ), initLeaves computer.time leaves_ )
+                   )
+
+        updatedLeaves =
+            Animation.filterLeaves
+                computer.time
+                memory.leaves
+                |> (++) leaves
 
         ( updatedData, addNow ) =
             clock computer.time memory.data
@@ -64,6 +72,7 @@ update computer memory =
         , combo = resetComboIfCut newCombo
         , lanes = ls
         , data = updatedData
+        , leaves = updatedLeaves
     }
 
 
@@ -72,7 +81,8 @@ update computer memory =
 
 
 view : Computer -> Memory -> List Shape
-view _ memory =
-    []
+view computer memory =
+    ([])
+        |> movingLeaves computer.time memory.leaves
         |> scorePanel { score = memory.score, combo = memory.combo }
         |> lanes memory.lanes

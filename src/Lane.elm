@@ -147,14 +147,7 @@ greatScore =
 
 notePanel : List Shape
 notePanel =
-    let
-        border =
-            4
-    in
-    [ rectangle grey panelSize border |> moveY (panelSize * 2 + border)
-    , rectangle grey panelSize border |> moveY -(panelSize * 2 + border)
-    , rectangle grey border panelSize |> moveX (panelSize * 2 + border)
-    , rectangle grey border panelSize |> moveX -(panelSize * 2 + border)
+    [ image panelSize panelSize "/assets/leaf_green.png"
     ]
 
 
@@ -168,11 +161,28 @@ press pressed l =
     { l | pressed = pressed }
 
 
-step : List Lane -> ( List Lane, Int, Combo )
+step : List Lane -> ( List Lane, (Int, Combo), List ( Number, Number ) )
 step ls =
     let
         filterOut ns =
             Array.filter (\n -> n.pos > noteOut) ns
+
+        pressedNotes =
+            List.concatMap
+                (\lane_ ->
+                    let
+                        xOf =
+                            xOfLane lane_
+                    in
+
+                    if lane_.pressed then
+                        Array.filter (\n -> n.pos < okFrame) lane_.notes
+                            |> Array.map (\y -> ( xOf, y.pos + panelHeight ))
+                            |> Array.toList
+
+                    else
+                        []
+                )
 
         filterPress pressed ns =
             if pressed then
@@ -213,10 +223,19 @@ step ls =
         |> (\( filteredls, scoresAndCombos ) ->
                 ( filteredls, List.unzip scoresAndCombos )
                     |> (\( retLane, ( retScore, retCombo ) ) ->
-                            ( retLane, List.foldl (+) 0 retScore, List.foldl addCombo (Continue 0) retCombo )
+                            ( retLane
+                            , ( List.foldl (+) 0 retScore, List.foldl addCombo (Continue 0) retCombo )
+                            , pressedNotes ls )
                        )
            )
 
+
+xOfLane : Lane -> Number
+xOfLane l = 
+    toFloat (2 * l.id - mentionedKeysLen + 1)
+        / 2
+        |> (*) panelInterval
+    
 
 lane : Lane -> List Shape
 lane l =
@@ -239,10 +258,7 @@ lane l =
            )
         |> List.map
             (move
-                (toFloat (2 * l.id - mentionedKeysLen + 1)
-                    / 2
-                    |> (*) panelInterval
-                )
+                ( xOfLane l )
                 panelHeight
             )
 
