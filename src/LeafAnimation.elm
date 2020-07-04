@@ -1,5 +1,6 @@
 module LeafAnimation exposing (Leaf, filterLeaves, initLeaves, movingLeaves)
 
+import Background exposing (destination)
 import Lane exposing (panelSize, panelScale)
 import Playground exposing (..)
 
@@ -12,9 +13,9 @@ type alias Leaf =
     }
 
 
-destination : ( Number, Number )
-destination =
-    ( -800, -0 )
+destination : Int -> ( Number, Number )
+destination score =
+    ( -800, Background.destination score + 270 )
 
 
 moveTime : Number
@@ -59,8 +60,8 @@ filterLeaves time leaves =
         leaves
 
 
-movingLeaves : Time -> List Leaf -> List Shape -> List Shape
-movingLeaves time leaves lst =
+movingLeaves : Time -> Int -> List Leaf -> List Shape -> List Shape
+movingLeaves time score leaves lst =
     List.map
         (\leaf ->
             let
@@ -75,10 +76,13 @@ movingLeaves time leaves lst =
                 ratio =
                     past / 360
 
+                dest =
+                    destination score
+
                 x =
-                    Tuple.first destination * ratio + leaf.x * (1 - ratio)
+                    Tuple.first dest * ratio + leaf.x * (1 - ratio)
                 y =
-                    Tuple.second destination * ratio + leaf.y * (1 - ratio)
+                    Tuple.second dest * ratio + leaf.y * (1 - ratio)
 
                 size =
                     panelSize * panelScale

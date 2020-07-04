@@ -47,7 +47,7 @@ isNoteAdd : Melody -> Int -> List Bool
 isNoteAdd melody elapsed =
     List.map
         (\m ->
-            Array.get elapsed m
+            Array.get (modBy (Array.length m) elapsed) m
                 |> Maybe.withDefault False
         )
         melody

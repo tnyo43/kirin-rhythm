@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Background exposing (destination, kirin)
 import Game exposing (Data, clock, initData)
 import Lane exposing (Combo(..), Lane, addCombo, addNote, initLanes, lanes, press, resetComboIfCut, step)
 import LeafAnimation exposing (..)
@@ -82,9 +83,8 @@ update computer memory =
 
 view : Computer -> Memory -> List Shape
 view computer memory =
-    [ image 1000 1000 "/assets/kirin.png"
-        |> move -800 -300
-    ]
-        |> movingLeaves computer.time memory.leaves
+    []
+        |> kirin memory.score
+        |> movingLeaves computer.time memory.score memory.leaves
         |> scorePanel { score = memory.score, combo = memory.combo }
         |> lanes memory.lanes
