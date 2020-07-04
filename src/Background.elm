@@ -2,6 +2,7 @@ module Background exposing (destination, kirin)
 
 import Playground exposing (..)
 
+
 scoreThre : Int
 scoreThre =
     30
@@ -9,7 +10,8 @@ scoreThre =
 
 destination : Int -> Number
 destination score =
-    scoreThre - score
+    scoreThre
+        - score
         |> max 0
         |> (*) -10
         |> toFloat
@@ -32,18 +34,31 @@ kirin score lst =
 
         neck =
             modBy 25 score
-            |> (*) 4
-            |> \s ->
-                List.range (if s >= 50 then 0 else 1) 10
-                |> List.map (\i ->
-                    oval brown 70 50
-                    |> move ((1 - modBy 2 i) |> (*) 20 |> (-) 10 |> toFloat) (50*i-s |> toFloat))
-            |> \l -> rectangle yellow 100 1000 :: l
-            |> List.map (move -40 -500)
-            
-        k =
-            neck ++ face 
-            |> List.map (move -700 (destination score + 250))
-    in
+                |> (*) 4
+                |> (\s ->
+                        List.range
+                            (if s >= 50 then
+                                0
 
+                             else
+                                1
+                            )
+                            14
+                            |> List.map
+                                (\i ->
+                                    oval brown 70 50
+                                        |> move ((1 - modBy 2 i) |> (*) 20 |> (-) 10 |> toFloat) (50 * i - s - 200 |> toFloat)
+                                )
+                            |> (\l ->
+                                    rectangle yellow 100 1000
+                                        :: l
+                                        |> List.map (move -40 -500)
+                               )
+                   )
+
+        k =
+            neck
+                ++ face
+                |> List.map (move -700 (destination score + 250))
+    in
     k ++ lst

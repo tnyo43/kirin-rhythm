@@ -13,7 +13,7 @@ type alias Lane =
     { id : Int
     , pressed : Bool
     , notes : Array Note
-    , key : String
+    , key : Char
     }
 
 
@@ -63,9 +63,9 @@ comboToInt c =
 -- const KEY
 
 
-mentionedKeys : List String
+mentionedKeys : List Char
 mentionedKeys =
-    [ "e", "f", "j", "o" ]
+    [ 'f', 'g', 'h', 'j' ]
 
 
 mentionedKeysLen : Int
@@ -256,7 +256,7 @@ lane l =
             blue
         )
         panelSize
-    , words white l.key
+    , words white ( l.key |> Char.toUpper |> String.fromChar )
     ]
         ++ (l.notes
                 |> Array.map

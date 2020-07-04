@@ -89,7 +89,7 @@ updateGame computer memory =
                          else
                             lane
                         )
-                            |> press (Set.member lane.key computer.keyboard.keys)
+                            |> press (Set.member ( String.fromChar lane.key ) computer.keyboard.keys)
                     )
                 |> step
                 |> (\( lane_, ( score, combo, miss ), leaves_ ) ->
@@ -145,15 +145,15 @@ update computer memory =
 -- VIEW
 
 
-viewTitle : Memory -> List Shape
-viewTitle memory =
+viewTitle : List Shape
+viewTitle =
     [ words black "Feed your giraff"
         |> scale 4
-    , words black "Play with your [E], [F], [J], [O] keys"
-        |> moveY -50
+    , words black "Play with your [F, G, H, J] keys"
+        |> moveY -70
         |> scale 2
-    , words black "space to restart"
-        |> moveY -80
+    , words black "space to start"
+        |> moveY -100
         |> scale 2
     ]
 
@@ -181,7 +181,7 @@ view : Computer -> Memory -> List Shape
 view computer memory =
     case memory.scene of
         Title ->
-            viewTitle memory
+            viewTitle
 
         Game ->
             viewGame computer memory

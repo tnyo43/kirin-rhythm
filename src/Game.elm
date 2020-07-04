@@ -28,9 +28,9 @@ initData : Data
 initData =
     let
         melody =
-            [ "a83019473b"
+            [ "283019473b"
             , "100ced7d73"
-            , "9184c0201a"
+            , "1184c0201a"
             , "fc24395481"
             ]
                 |> List.map (fromHex >> toBooleans >> Array.fromList)
