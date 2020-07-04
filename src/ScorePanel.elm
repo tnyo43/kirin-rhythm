@@ -14,25 +14,17 @@ scorePanel : Info -> List Shape -> List Shape
 scorePanel memory lst =
     [ words
         black
-        "score"
-        |> scale 6
+        "current height : "
+        |> scale 3
         |> moveY 450
     , words
         black
-        (memory.score |> String.fromInt)
+        ((memory.score |> String.fromInt) ++ "m")
         |> scale 10
         |> moveY 300
-    , words
-        black
-        "combo"
-        |> scale 6
-        |> moveY 150
-    , words
-        black
-        (memory.combo |> comboToInt |> String.fromInt)
-        |> scale 10
+
     ]
-        |> List.map (moveX 500)
+        |> List.map (moveX -500)
         |> (\shapes -> List.append shapes lst)
 
 
