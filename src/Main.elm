@@ -18,11 +18,13 @@ main =
         view
         update
         (Memory
+            Title
             0
             (Continue 0)
             initLanes
             initData
             []
+            0
         )
 
 
@@ -30,19 +32,54 @@ main =
 -- UPDATE
 
 
+type Scene
+    = Title
+    | Game
+    | Ending
+
+
 type alias Memory =
-    { score : Int
+    { scene : Scene
+    , score : Int
     , combo : Combo
     , lanes : List Lane
     , data : Data
     , leaves : List Leaf
+    , miss : Int
     }
 
 
-update : Computer -> Memory -> Memory
-update computer memory =
+initGame : Memory -> Memory
+initGame memory =
+    { memory
+        | scene = Game
+        , score = 0
+        , combo = Continue 0
+        , lanes = initLanes
+        , data = initData
+        , leaves = []
+        , miss = 0
+    }
+
+
+endGame : Memory -> Memory
+endGame memory =
+    { memory | scene = Ending }
+
+
+updateTitle : Computer -> Memory -> Memory
+updateTitle computer memory =
+    if computer.keyboard.space then
+        initGame memory
+
+    else
+        memory
+
+
+updateGame : Computer -> Memory -> Memory
+updateGame computer memory =
     let
-        ( ls, ( newScore, newCombo ), leaves ) =
+        ( ls, ( newScore, newCombo, newMiss ), leaves ) =
             List.map2 Tuple.pair addNow memory.lanes
                 |> List.map
                     (\( addnow, lane ) ->
@@ -55,8 +92,8 @@ update computer memory =
                             |> press (Set.member lane.key computer.keyboard.keys)
                     )
                 |> step
-                |> (\( lane_, ( score, combo ), leaves_ ) ->
-                        ( lane_, ( score + memory.score, addCombo combo memory.combo ), initLeaves computer.time leaves_ )
+                |> (\( lane_, ( score, combo, miss ), leaves_ ) ->
+                        ( lane_, ( score + memory.score, addCombo combo memory.combo, miss + memory.miss ), initLeaves computer.time leaves_ )
                    )
 
         updatedLeaves =
@@ -68,23 +105,86 @@ update computer memory =
         ( updatedData, addNow ) =
             clock computer.time memory.data
     in
-    { memory
-        | score = newScore
-        , combo = resetComboIfCut newCombo
-        , lanes = ls
-        , data = updatedData
-        , leaves = updatedLeaves
-    }
+    if newMiss >= 3 then
+        endGame memory
+
+    else
+        { memory
+            | score = newScore
+            , combo = resetComboIfCut newCombo
+            , lanes = ls
+            , data = updatedData
+            , leaves = updatedLeaves
+            , miss = newMiss
+        }
+
+
+updateEnding : Computer -> Memory -> Memory
+updateEnding computer memory =
+    if computer.keyboard.space then
+        initGame memory
+
+    else
+        memory
+
+
+update : Computer -> Memory -> Memory
+update computer memory =
+    case memory.scene of
+        Title ->
+            updateTitle computer memory
+
+        Game ->
+            updateGame computer memory
+
+        Ending ->
+            updateEnding computer memory
 
 
 
 -- VIEW
 
 
-view : Computer -> Memory -> List Shape
-view computer memory =
+viewTitle : Computer -> Memory -> List Shape
+viewTitle computer memory =
+    [ words black "Feed your giraff"
+        |> scale 4
+    , words black "Play with your [E], [F], [J], [O] keys"
+        |> moveY -50
+        |> scale 2
+    , words black "space to restart"
+        |> moveY -80
+        |> scale 2
+    ]
+
+
+viewGame : Computer -> Memory -> List Shape
+viewGame computer memory =
     []
         |> kirin memory.score
         |> movingLeaves computer.time memory.score memory.leaves
         |> scorePanel { score = memory.score, combo = memory.combo }
         |> lanes memory.lanes
+
+
+viewEnding : Memory -> List Shape
+viewEnding memory =
+    [ words black ("Your Giraff grow to " ++ (memory.score |> String.fromInt) ++ " meters!!")
+        |> scale 4
+    , words black "space to restart"
+        |> moveY -50
+        |> scale 2
+    ]
+
+
+view : Computer -> Memory -> List Shape
+view computer memory =
+    case memory.scene of
+        Title ->
+            viewTitle computer memory
+
+        Game ->
+            viewGame computer memory
+
+        Ending ->
+            viewEnding memory

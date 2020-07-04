@@ -161,7 +161,7 @@ press pressed l =
     { l | pressed = pressed }
 
 
-step : List Lane -> ( List Lane, (Int, Combo), List ( Number, Number ) )
+step : List Lane -> ( List Lane, (Int, Combo, Int), List ( Number, Number ) )
 step ls =
     let
         filterOut ns =
@@ -224,7 +224,7 @@ step ls =
                 ( filteredls, List.unzip scoresAndCombos )
                     |> (\( retLane, ( retScore, retCombo ) ) ->
                             ( retLane
-                            , ( List.foldl (+) 0 retScore, List.foldl addCombo (Continue 0) retCombo )
+                            , ( List.foldl (+) 0 retScore, List.foldl addCombo (Continue 0) retCombo, List.filter ((==) Cut) retCombo |> List.length )
                             , pressedNotes ls )
                        )
            )
