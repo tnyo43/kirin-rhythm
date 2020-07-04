@@ -1,4 +1,4 @@
-module Lane exposing (Combo(..), Lane, addCombo, addNote, comboToInt, initLanes, lanes, press, resetComboIfCut, step, panelSize, panelScale)
+module Lane exposing (Combo(..), Lane, addCombo, addNote, comboToInt, initLanes, lanes, panelScale, panelSize, press, resetComboIfCut, step)
 
 import Array exposing (Array)
 import Playground exposing (..)
@@ -116,6 +116,11 @@ okFrame =
     greatFrame * 3
 
 
+ngFrame : Number
+ngFrame =
+    okFrame + 10
+
+
 noteIn : Number
 noteIn =
     1000
@@ -161,7 +166,7 @@ press pressed l =
     { l | pressed = pressed }
 
 
-step : List Lane -> ( List Lane, (Int, Combo, Int), List ( Number, Number ) )
+step : List Lane -> ( List Lane, ( Int, Combo, Int ), List ( Number, Number ) )
 step ls =
     let
         filterOut ns =
@@ -174,9 +179,8 @@ step ls =
                         xOf =
                             xOfLane lane_
                     in
-
                     if lane_.pressed then
-                        Array.filter (\n -> n.pos < okFrame) lane_.notes
+                        Array.filter (\n -> n.pos <= okFrame) lane_.notes
                             |> Array.map (\y -> ( xOf, y.pos + panelHeight ))
                             |> Array.toList
 
@@ -186,7 +190,7 @@ step ls =
 
         filterPress pressed ns =
             if pressed then
-                Array.filter (\n -> n.pos >= okFrame) ns
+                Array.filter (\n -> n.pos > ngFrame) ns
 
             else
                 ns
@@ -195,16 +199,19 @@ step ls =
             if Array.filter (\n -> n.pos <= noteOut) ns |> Array.isEmpty |> not then
                 Cut
 
+            else if pressed && (Array.filter (\n -> abs n.pos <= ngFrame && abs n.pos > okFrame) ns |> Array.isEmpty |> not) then
+                Cut
+
             else if pressed then
-                Array.filter (\n -> abs n.pos < okFrame) ns |> Array.length |> Continue
+                Array.filter (\n -> abs n.pos <= okFrame) ns |> Array.length |> Continue
 
             else
                 Continue 0
 
         getScore pressed ns =
             if pressed then
-                (Array.filter (\n -> abs n.pos < okFrame) ns |> Array.length |> (*) okScore)
-                    + (Array.filter (\n -> abs n.pos < greatFrame) ns |> Array.length |> (*) greatScore)
+                (Array.filter (\n -> abs n.pos <= okFrame) ns |> Array.length |> (*) okScore)
+                    + (Array.filter (\n -> abs n.pos <= greatFrame) ns |> Array.length |> (*) greatScore)
 
             else
                 0
@@ -225,17 +232,18 @@ step ls =
                     |> (\( retLane, ( retScore, retCombo ) ) ->
                             ( retLane
                             , ( List.foldl (+) 0 retScore, List.foldl addCombo (Continue 0) retCombo, List.filter ((==) Cut) retCombo |> List.length )
-                            , pressedNotes ls )
+                            , pressedNotes ls
+                            )
                        )
            )
 
 
 xOfLane : Lane -> Number
-xOfLane l = 
+xOfLane l =
     toFloat (2 * l.id - mentionedKeysLen + 1)
         / 2
         |> (*) panelInterval
-    
+
 
 lane : Lane -> List Shape
 lane l =
@@ -258,7 +266,7 @@ lane l =
            )
         |> List.map
             (move
-                ( xOfLane l )
+                (xOfLane l)
                 panelHeight
             )
 
