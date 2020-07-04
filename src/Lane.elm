@@ -147,7 +147,7 @@ greatScore =
 
 notePanel : List Shape
 notePanel =
-    [ image panelSize panelSize "/assets/leaf_green.png"
+    [ image panelSize panelSize "/assets/leaf.png"
     ]
 
 

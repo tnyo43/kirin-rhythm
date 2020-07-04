@@ -91,7 +91,8 @@ movingLeaves time score leaves lst =
             image
                 size
                 size
-                "/assets/leaf_lightgreen.png"
+                "/assets/leaf.png"
+                |> fade 0.5
                 |> move x y
         )
         leaves
