@@ -28,10 +28,10 @@ initData : Data
 initData =
     let
         melody =
-            [ "283019473b"
-            , "100ced7d73"
-            , "1184c0201a"
-            , "fc24395481"
+            [ "0800040110"
+            , "00fc22522c"
+            , "5102b1a243"
+            , "0304080180"
             ]
                 |> List.map (fromHex >> toBooleans >> Array.fromList)
     in
