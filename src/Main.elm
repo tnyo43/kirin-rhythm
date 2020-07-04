@@ -5,7 +5,7 @@ import Game exposing (Data, clock, initData)
 import Lane exposing (Combo(..), Lane, addCombo, addNote, initLanes, lanes, press, resetComboIfCut, step)
 import LeafAnimation exposing (..)
 import Playground exposing (..)
-import ScorePanel exposing (scorePanel)
+import ScorePanel exposing (scorePanel, missCount)
 import Set exposing (member)
 
 
@@ -145,8 +145,8 @@ update computer memory =
 -- VIEW
 
 
-viewTitle : Computer -> Memory -> List Shape
-viewTitle computer memory =
+viewTitle : Memory -> List Shape
+viewTitle memory =
     [ words black "Feed your giraff"
         |> scale 4
     , words black "Play with your [E], [F], [J], [O] keys"
@@ -160,7 +160,7 @@ viewTitle computer memory =
 
 viewGame : Computer -> Memory -> List Shape
 viewGame computer memory =
-    []
+    missCount memory.miss
         |> kirin memory.score
         |> movingLeaves computer.time memory.score memory.leaves
         |> scorePanel { score = memory.score, combo = memory.combo }
@@ -181,7 +181,7 @@ view : Computer -> Memory -> List Shape
 view computer memory =
     case memory.scene of
         Title ->
-            viewTitle computer memory
+            viewTitle memory
 
         Game ->
             viewGame computer memory
