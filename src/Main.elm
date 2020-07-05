@@ -147,7 +147,7 @@ update computer memory =
 
 viewTitle : List Shape
 viewTitle =
-    [ words black "Feed your giraff"
+    [ words black "Feed your giraffe"
         |> scale 4
     , words black "Play with your [D, F, J, K] keys"
         |> moveY -70
@@ -170,7 +170,7 @@ viewGame computer memory =
 viewEnding : Memory -> List Shape
 viewEnding memory =
     wholeKirin memory.score 350
-    [ words black ("Your Giraff grow to " ++ (memory.score |> String.fromInt) ++ " meters!!")
+    [ words black ("Your Giraffe grow to " ++ (memory.score |> String.fromInt) ++ " meters!!")
         |> scale 4
     , words black "space to restart"
         |> moveY -50
