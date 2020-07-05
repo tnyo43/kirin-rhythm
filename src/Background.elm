@@ -68,16 +68,18 @@ kirinBody score =
         |> List.map (move -100 -( 5 * (toFloat score) + 120))
 
 
+baseKirin : Int -> List Shape
+baseKirin score =
+    kirinBody score
+        |> List.map (moveX -40)
+        |> \body -> kirinNeck score ++ body ++ kirinFace
+
+
 kirin : Int -> List Shape -> List Shape
 kirin score lst =
     let
-        neck =
-            kirinNeck score
-
         k =
-            neck
-                ++ kirinBody score
-                ++ kirinFace
+            baseKirin score
                 |> List.map (move -700 (destination score + 250))
     in
     k ++ lst
@@ -90,6 +92,7 @@ wholeKirin score y lst =
             toFloat score |> (*) 5
 
         k =
-            kirinNeck score ++ kirinBody score ++ kirinFace |> List.map (moveY (s + y))
+            baseKirin score
+             |> List.map (moveY (s + y))
     in
     k ++ lst
