@@ -149,7 +149,7 @@ viewTitle : List Shape
 viewTitle =
     [ words black "Feed your giraff"
         |> scale 4
-    , words black "Play with your [F, G, H, J] keys"
+    , words black "Play with your [D, F, J, K] keys"
         |> moveY -70
         |> scale 2
     , words black "space to start"

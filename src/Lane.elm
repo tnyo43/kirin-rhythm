@@ -65,7 +65,7 @@ comboToInt c =
 
 mentionedKeys : List Char
 mentionedKeys =
-    [ 'f', 'g', 'h', 'j' ]
+    [ 'd', 'f', 'j', 'k' ]
 
 
 mentionedKeysLen : Int
