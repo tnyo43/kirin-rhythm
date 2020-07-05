@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Background exposing (destination, kirin)
+import Background exposing (kirin, wholeKirin)
 import Game exposing (Data, clock, initData)
 import Lane exposing (Combo(..), Lane, addCombo, addNote, initLanes, lanes, press, resetComboIfCut, step)
 import LeafAnimation exposing (..)
@@ -169,6 +169,7 @@ viewGame computer memory =
 
 viewEnding : Memory -> List Shape
 viewEnding memory =
+    wholeKirin memory.score 350
     [ words black ("Your Giraff grow to " ++ (memory.score |> String.fromInt) ++ " meters!!")
         |> scale 4
     , words black "space to restart"
